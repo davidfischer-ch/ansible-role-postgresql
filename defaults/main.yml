@@ -1,30 +1,95 @@
+# Packages
+postgresql_dynamic_defaults:
+
+  apt:
+    postgresql_bin_directory: /usr/lib/postgresql/{{ postgresql_version }}/bin
+    postgresql_config_directory: /etc/postgresql/{{ postgresql_version }}/main
+    postgresql_data_directory: /var/lib/postgresql/{{ postgresql_version }}/main
+    postgresql_lib_directory: /usr/lib/postgresql/{{ postgresql_version }}/lib
+    postgresql_pid_file: /var/run/postgresql/{{ postgresql_version }}-main.pid
+
+    postgresql_packages:
+      - postgresql-{{ postgresql_version }}
+      - postgresql-client-{{ postgresql_version }}
+      - postgresql-server-dev-{{ postgresql_version }}
+      - postgresql-contrib-{{ postgresql_version }}
+
+    postgresql_service: postgresql
+
+    postgresql_ssl_enabled: yes
+    postgresql_ssl_cert_file: /etc/ssl/certs/ssl-cert-snakeoil.pem
+    postgresql_ssl_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
+
+  redhat-7.*:
+    postgresql_bin_directory: /opt/rh/rh-postgresql{{ _postgresql_version }}/root/usr/bin
+    postgresql_config_directory: /var/opt/rh/rh-postgresql{{ _postgresql_version }}/lib/pgsql/data
+    postgresql_data_directory: /var/opt/rh/rh-postgresql{{ _postgresql_version }}/lib/pgsql/data
+    postgresql_lib_directory: /opt/rh/rh-postgresql{{ _postgresql_version }}/root/usr/lib64
+    postgresql_pid_file: ''  # Disable extra PID file
+
+    postgresql_packages:
+      - rh-postgresql{{ _postgresql_version }}-postgresql
+      - rh-postgresql{{ _postgresql_version }}-postgresql-contrib
+      - rh-postgresql{{ _postgresql_version }}-postgresql-server
+
+    postgresql_service: rh-postgresql{{ _postgresql_version }}-postgresql
+
+    postgresql_ssl_enabled: no
+    postgresql_ssl_cert_file: server.crt
+    postgresql_ssl_key_file: server.key
+
+# Paths
+postgresql_config_file: postgresql.{{ postgresql_version }}.conf.j2
+
+# Configuration
 postgresql_allocated_ram: 2048  # In megabytes
 postgresql_authentication_rules: []
-postgresql_config_file: 'postgresql.{{ postgresql_version }}.conf.j2'
 postgresql_effective_cache_size: '{{ postgresql_allocated_ram // 2 }}MB'
 postgresql_extensions: []
+postgresql_maintenance_work_mem: '{{ postgresql_allocated_ram // 16 }}MB'
+postgresql_max_connections: 100
+postgresql_shared_buffers: '{{ postgresql_allocated_ram // 4 }}MB'
+postgresql_work_mem: '{{ 2 * postgresql_allocated_ram // postgresql_max_connections }}MB'
+
+# Connection
+postgresql_authentication_timeout: 1min
+postgresql_ssl_ca_file: ''
+postgresql_ssl_ciphers: HIGH:MEDIUM:+3DES:!aNULL
+postgresql_ssl_prefer_server_ciphers: yes
+postgresql_ssl_ecdh_curve: prime256v1
+postgresql_ssl_dh_params_file: ''
+postgresql_ssl_crl_file: ''
+
+# Initialization
+postgresql_initdb_options: []
+
+# Logging
+postgresql_log_destinations: [stderr]
+postgresql_log_directory: log
+postgresql_log_timezone: UTC
+postgresql_log_collector_enabled: no  # logging_collector
+postgresql_log_filename: postgresql-%Y-%m-%d_%H%M%S.log
+postgresql_log_file_mode: '0600'
+postgresql_log_rotation_age: 1d
+postgresql_log_rotation_size: 10MB
+postgresql_log_truncate_on_rotation: no  # log_truncate_on_rotation
+
+# Networking
 postgresql_interface: null
 postgresql_listen_addresses:
   - '*'
-postgresql_log_timezone: UTC
-postgresql_maintenance_work_mem: '{{ postgresql_allocated_ram // 16 }}MB'
-postgresql_max_connections: 100
-postgresql_packages:
-  - 'postgresql-{{ postgresql_version }}'
-  - 'postgresql-client-{{ postgresql_version }}'
-  - 'postgresql-server-dev-{{ postgresql_version }}'
-  - 'postgresql-contrib-{{ postgresql_version }}'
 postgresql_port: 5432
-postgresql_shared_buffers: '{{ postgresql_allocated_ram // 4 }}MB'
 postgresql_ufw_rules:
   - direction: in
     interface: '{{ postgresql_interface or omit }}'
     port: '{{ postgresql_port }}'
     proto: tcp
     rule: allow
-# postgresql_version: 9.6  # 15/08/2018
-postgresql_work_mem: '{{ 2 * postgresql_allocated_ram // postgresql_max_connections }}MB'
-# private
+
+# Private
 _postgresql_allow: {}
 _postgresql_config:
   changed: yes
+
+# postgresql_version: 9.6  # 15/08/2018
+_postgresql_version: "{{ postgresql_version|string|regex_replace('\\.', '') }}"

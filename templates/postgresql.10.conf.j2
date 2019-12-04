@@ -38,17 +38,18 @@
 # The default values of these variables are driven from the -D command-line
 # option or PGDATA environment variable, represented here as ConfigDir.
 
-data_directory = '/var/lib/postgresql/{{ postgresql_version }}/main'		# use data in another directory
+data_directory = '{{ postgresql_data_directory }}'		# use data in another directory
 					# (change requires restart)
-hba_file = '/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf'	# host-based authentication file
+hba_file = '{{ postgresql_config_directory }}/pg_hba.conf'	# host-based authentication file
 					# (change requires restart)
-ident_file = '/etc/postgresql/{{ postgresql_version }}/main/pg_ident.conf'	# ident configuration file
+ident_file = '{{ postgresql_config_directory }}/pg_ident.conf'	# ident configuration file
 					# (change requires restart)
 
+{% if postgresql_pid_file|length > 0 %}
 # If external_pid_file is not explicitly set, no extra PID file is written.
-external_pid_file = '/var/run/postgresql/{{ postgresql_version }}-main.pid'			# write an extra PID file
+external_pid_file = '{{ postgresql_pid_file }}'			# write an extra PID file
 					# (change requires restart)
-
+{% endif %}
 
 #------------------------------------------------------------------------------
 # CONNECTIONS AND AUTHENTICATION
@@ -75,16 +76,16 @@ unix_socket_directories = '/var/run/postgresql'	# comma-separated list of direct
 
 # - Security and Authentication -
 
-#authentication_timeout = 1min		# 1s-600s
-ssl = on
-#ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers
-#ssl_prefer_server_ciphers = on
-#ssl_ecdh_curve = 'prime256v1'
-#ssl_dh_params_file = ''
-ssl_cert_file = '/etc/ssl/certs/ssl-cert-snakeoil.pem'
-ssl_key_file = '/etc/ssl/private/ssl-cert-snakeoil.key'
-#ssl_ca_file = ''
-#ssl_crl_file = ''
+authentication_timeout = {{ postgresql_authentication_timeout }}		# 1s-600s
+ssl = {{ postgresql_ssl_enabled|bool|ternary('on', 'off') }}
+ssl_ciphers = '{{ postgresql_ssl_ciphers }}' # allowed SSL ciphers
+ssl_prefer_server_ciphers = {{ postgresql_ssl_prefer_server_ciphers|bool|ternary('on', 'off') }}
+ssl_ecdh_curve = '{{ postgresql_ssl_ecdh_curve }}'
+ssl_dh_params_file = '{{ postgresql_ssl_dh_params_file }}'
+ssl_cert_file = '{{ postgresql_ssl_cert_file }}'
+ssl_key_file = '{{ postgresql_ssl_key_file }}'
+ssl_ca_file = '{{ postgresql_ssl_ca_file }}'
+ssl_crl_file = '{{ postgresql_ssl_crl_file }}'
 #password_encryption = md5		# md5 or scram-sha-256
 #db_user_namespace = off
 #row_security = on
@@ -341,25 +342,25 @@ effective_cache_size = {{ postgresql_effective_cache_size }}
 
 # - Where to Log -
 
-#log_destination = 'stderr'		# Valid values are combinations of
+log_destination = '{{ postgresql_log_destinations|join(',') }}'		# Valid values are combinations of
 					# stderr, csvlog, syslog, and eventlog,
 					# depending on platform.  csvlog
 					# requires logging_collector to be on.
 
 # This is used when logging to stderr:
-#logging_collector = off		# Enable capturing of stderr and csvlog
+logging_collector = {{ postgresql_log_collector_enabled|bool|ternary('on', 'off') }}		# Enable capturing of stderr and csvlog
 					# into log files. Required to be on for
 					# csvlogs.
 					# (change requires restart)
 
 # These are only used if logging_collector is on:
-#log_directory = 'log'			# directory where log files are written,
+log_directory = '{{ postgresql_log_directory }}'			# directory where log files are written,
 					# can be absolute or relative to PGDATA
-#log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'	# log file name pattern,
+log_filename = '{{ postgresql_log_filename }}'	# log file name pattern,
 					# can include strftime() escapes
-#log_file_mode = 0600			# creation mode for log files,
+log_file_mode = {{ postgresql_log_file_mode }}			# creation mode for log files,
 					# begin with 0 to use octal notation
-#log_truncate_on_rotation = off		# If on, an existing log file with the
+log_truncate_on_rotation = {{ postgresql_log_truncate_on_rotation|bool|ternary('on', 'off') }}		# If on, an existing log file with the
 					# same name as the new log file will be
 					# truncated rather than appended to.
 					# But such truncation only occurs on
@@ -367,9 +368,9 @@ effective_cache_size = {{ postgresql_effective_cache_size }}
 					# or size-driven rotation.  Default is
 					# off, meaning append to existing files
 					# in all cases.
-#log_rotation_age = 1d			# Automatic rotation of logfiles will
+log_rotation_age = {{ postgresql_log_rotation_age }}			# Automatic rotation of logfiles will
 					# happen after that time.  0 disables.
-#log_rotation_size = 10MB		# Automatic rotation of logfiles will
+log_rotation_size = {{ postgresql_log_rotation_size }}		# Automatic rotation of logfiles will
 					# happen after that much log output.
 					# 0 disables.
 

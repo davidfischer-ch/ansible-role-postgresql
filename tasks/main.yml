@@ -1,6 +1,12 @@
 # Install and configure PostgreSQL including setup our user & database
 ---
 
+- dynamic_defaults:
+    hostvars: '{{ hostvars[inventory_hostname] }}'
+    defaults: '{{ postgresql_dynamic_defaults }}'
+    must_match: yes
+  tags: [postgresql, always]
+
 - name: Install PostgreSQL packages
   package:
     name: '{{ postgresql_packages }}'
@@ -9,33 +15,47 @@
   tags: [postgresql, packages]
 
 - block:
+    - name: Initialize PostgreSQL
+      command: >
+        {{ postgresql_bin_directory }}/initdb
+        --pgdata {{ postgresql_data_directory }}
+        {{ postgresql_initdb_options|join(' ') }}
+      args:
+        creates: '{{ postgresql_data_directory }}/PG_VERSION'
+      become_user: postgres
+      environment:
+        PATH: '{{ postgresql_bin_directory }}:$PATH'
+        LD_LIBRARY_PATH: '{{ postgresql_lib_directory }}:$LD_LIBRARY_PATH'
+
+    - name: Create PostgreSQL directories
+      file:
+        path: '{{ item }}'
+        owner: postgres
+        group: postgres
+        mode: 0700
+        state: directory
+      loop:
+        - '{{ postgresql_data_directory }}/conf.d'
+
     - name: Configure PostgreSQL
       template:
         src: '{{ postgresql_config_file }}'
-        dest: /etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+        dest: '{{ postgresql_config_directory }}/postgresql.conf'
         mode: 0644
-      register: _postgresql_config
+      notify: restart postgresql
 
     - name: Configure PostgreSQL allowed hosts
       template:
         src: pg_hba.conf.j2
-        dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+        dest: '{{ postgresql_config_directory }}/pg_hba.conf'
         mode: 0644
-      register: _postgresql_allow
-
-    - name: Restart PostgreSQL service
-      service:
-        name: postgresql
-        enabled: yes
-        state: restarted
-      tags: flush-extra
-      when: _postgresql_config is change or _postgresql_allow is change
+      notify: restart postgresql
   become: yes
   tags: [postgresql, config]
 
 - name: Start PostgreSQL service
   service:
-    name: postgresql
+    name: '{{ postgresql_service }}'
     enabled: yes
     state: started
   become: yes
