@@ -7,11 +7,7 @@
     must_match: yes
   tags: [postgresql, always]
 
-- name: Install PostgreSQL packages
-  package:
-    name: '{{ postgresql_packages }}'
-    state: present
-  become: yes
+- include: setup-{{ ansible_pkg_mgr }}.yml
   tags: [postgresql, packages]
 
 - block:

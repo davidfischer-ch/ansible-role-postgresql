@@ -38,6 +38,8 @@ postgresql_dynamic_defaults:
     postgresql_ssl_cert_file: server.crt
     postgresql_ssl_key_file: server.key
 
+postgresql_yum_enablerepo: '{{ omit }}'
+
 # Paths
 postgresql_config_file: postgresql.{{ postgresql_version }}.conf.j2
 
