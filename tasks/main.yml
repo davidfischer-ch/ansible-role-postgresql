@@ -96,7 +96,6 @@
         name:
           - libgeoip1
         state: present
-
   become: yes
   tags: [postgresql, packages]
   when: "'postgis' in postgresql_extensions"
@@ -104,4 +103,6 @@
 - include_role:
     name: postgresql-databases
   tags: [postgresql, databases]
+  vars:
+    postgresql_databases_role_action: setup
   when: postgresql_is_master|bool
