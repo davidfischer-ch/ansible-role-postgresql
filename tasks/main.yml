@@ -46,6 +46,9 @@
         dest: '{{ postgresql_config_directory }}/pg_hba.conf'
         mode: 0644
       notify: restart postgresql
+
+    # Apply configuration now!
+    - meta: flush_handlers
   become: yes
   tags: [postgresql, config]
 
