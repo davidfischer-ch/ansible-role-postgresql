@@ -20,6 +20,24 @@ postgresql_dynamic_defaults:
     postgresql_ssl_cert_file: /etc/ssl/certs/ssl-cert-snakeoil.pem
     postgresql_ssl_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
 
+  redhat-8.*:
+    postgresql_bin_directory: /opt/rh/rh-postgresql{{ _postgresql_version }}/root/usr/bin
+    postgresql_config_directory: /var/opt/rh/rh-postgresql{{ _postgresql_version }}/lib/pgsql/data
+    postgresql_data_directory: /var/opt/rh/rh-postgresql{{ _postgresql_version }}/lib/pgsql/data
+    postgresql_lib_directory: /opt/rh/rh-postgresql{{ _postgresql_version }}/root/usr/lib64
+    postgresql_pid_file: ''  # Disable extra PID file
+
+    postgresql_packages:
+      - postgresql
+      - postgresql-contrib
+      - postgresql-server
+
+    postgresql_service: rh-postgresql{{ _postgresql_version }}-postgresql
+
+    postgresql_ssl_enabled: no
+    postgresql_ssl_cert_file: server.crt
+    postgresql_ssl_key_file: server.key
+
   redhat-7.*:
     postgresql_bin_directory: /opt/rh/rh-postgresql{{ _postgresql_version }}/root/usr/bin
     postgresql_config_directory: /var/opt/rh/rh-postgresql{{ _postgresql_version }}/lib/pgsql/data
@@ -39,6 +57,7 @@ postgresql_dynamic_defaults:
     postgresql_ssl_key_file: server.key
 
 postgresql_yum_enablerepo: '{{ omit }}'
+postgresql_dnf_enablerepo: '{{ omit }}'
 
 # Paths
 postgresql_config_file: postgresql.{{ postgresql_version }}.conf.j2
