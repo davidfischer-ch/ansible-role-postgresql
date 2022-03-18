@@ -26,13 +26,13 @@ postgresql_dynamic_defaults:
     postgresql_ssl_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
 
   debian:
-    postgresql_timescaledb_apt_repository: deb https://packagecloud.io/timescale/timescaledb/debian/ {{ ansible_distribution_version }} main
+    postgresql_timescaledb_apt_repository: deb https://packagecloud.io/timescale/timescaledb/debian/ {{ ansible_distribution_release }} main
 
   linux-mint:
-    postgresql_timescaledb_apt_repository: deb https://packagecloud.io/timescale/timescaledb/ubuntu/ {{ ansible_distribution_version }} main
+    postgresql_timescaledb_apt_repository: deb https://packagecloud.io/timescale/timescaledb/ubuntu/ {{ ansible_distribution_release }} main
 
   ubuntu:
-    postgresql_timescaledb_apt_repository: deb https://packagecloud.io/timescale/timescaledb/ubuntu/ {{ ansible_distribution_version }} main
+    postgresql_timescaledb_apt_repository: deb https://packagecloud.io/timescale/timescaledb/ubuntu/ {{ ansible_distribution_release }} main
 
   redhat-8.*:
     postgresql_bin_directory: /opt/rh/rh-postgresql{{ _postgresql_version }}/root/usr/bin
