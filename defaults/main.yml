@@ -98,6 +98,7 @@ postgresql_ssl_crl_file: ''
 # Extensions
 postgresql_shared_preload_libraries: []  # (change requires restart)
 
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-timescaledb-on-ubuntu-20-04
 postgresql_timescaledb_max_background_workers: 8
 
 # Initialization
