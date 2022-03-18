@@ -1,0 +1,16 @@
+---
+
+- block:
+    - name: Register TimescaleDB apt key
+      apt_key:
+        url: '{{ postgresql_timescaledb_apt_key }}'
+        state: present
+
+    - name: Install TimescaleDB apt repository
+      apt_repository:
+        repo: '{{ postgresql_timescaledb_apt_repository }}'
+        filename: ansible_roles_postgresql_timescaledb
+        state: present
+        update_cache: yes
+  become: '{{ do_become }}'
+  tags: [postgresql, packages]  # FIXME Remove when this is fixed https://github.com/ansible/ansible/issues/30882

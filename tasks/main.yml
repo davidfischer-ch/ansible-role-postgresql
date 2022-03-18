@@ -1,10 +1,16 @@
 # Install and configure PostgreSQL including setup our user & database
 ---
 
-- dynamic_defaults:
-    hostvars: '{{ hostvars[inventory_hostname] }}'
-    defaults: '{{ postgresql_dynamic_defaults }}'
-    must_match: yes
+- block:
+    - dynamic_defaults:
+        hostvars: '{{ hostvars[inventory_hostname] }}'
+        defaults: '{{ postgresql_dynamic_defaults }}'
+        must_match: yes
+
+    - name: Add TimescaleDB to shared preload libraries
+      set_fact:
+        postgresql_shared_preload_libraries: '{{ postgresql_shared_preload_libraries|union(["timescaledb"]) }}'
+      when: "'timescaledb' in postgresql_extensions"
   tags: [postgresql, always]
 
 - include: setup-{{ ansible_pkg_mgr }}.yml
@@ -102,6 +108,17 @@
   become: yes
   tags: [postgresql, packages]
   when: "'postgis' in postgresql_extensions"
+
+- block:
+    - include_tasks: setup-timescaledb-repository-{{ ansible_pkg_mgr }}.yml
+
+    - name: Install TimescaleDB packages
+      package:
+        name: '{{ postgresql_timescaledb_packages }}'
+        state: present
+  become: yes
+  tags: [postgresql, packages]
+  when: "'timescaledb' in postgresql_extensions"
 
 - include_role:
     name: postgresql-databases
