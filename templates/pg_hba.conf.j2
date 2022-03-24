@@ -76,9 +76,6 @@
 # listen on a non-local interface via the listen_addresses
 # configuration parameter, or via the -i or -h command line switches.
 
-
-
-
 # DO NOT DISABLE!
 # If you change this first entry you will need to make sure that the
 # database superuser can access the database using some other method.
@@ -86,29 +83,12 @@
 # maintenance (custom daily cronjobs, replication, and similar tasks).
 #
 # Database administrative login by Unix domain socket
-local   all             postgres                                md5
-local   all             postgres                                peer
-local   postgres        postgres                                trust
-
 
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
-
-# "local" is for Unix domain socket connections only
-local   all             all                                     peer
-# IPv4 local connections:
-host    all             all             127.0.0.1/32            md5
-# IPv6 local connections:
-host    all             all             ::1/128                 md5
-# Allow replication connections from localhost, by a user with the
-# replication privilege.
-local   replication     all                                     peer
-host    replication     all             127.0.0.1/32            md5
-host    replication     all             ::1/128                 md5
+local   all             postgres                                trust
 
 {{ postgresql_authentication_rules|join('\n') }}
 {% for name, database in postgresql_databases.items()|sort %}
-
-local {{ database.name }} postgres trust
 
 {% for user in database.users|default([]) %}
 {% for client in user.clients %}
