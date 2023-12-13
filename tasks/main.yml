@@ -50,7 +50,7 @@
       template:
         src: pg_hba.conf.j2
         dest: '{{ postgresql_config_directory }}/pg_hba.conf'
-        mode: '644'
+        mode: '640'
       notify: restart postgresql
 
     # Apply configuration now!
