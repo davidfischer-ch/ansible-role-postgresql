@@ -94,6 +94,8 @@ local   all             postgres                                trust
 {% for client in user.clients %}
 host postgres {{ user.name }} {{ client }} md5
 host {{ database.name }} {{ user.name }} {{ client }} md5
+host {{ database.name }} {{ user.name }} {{ client }} password
+host {{ database.name }} {{ user.name }} {{ client }} scram-sha-256
 {% endfor %}
 {% endfor %}
 
