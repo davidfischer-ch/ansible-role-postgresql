@@ -66,6 +66,15 @@
   become: yes
   tags: [postgresql, services]
 
+- name: Install PG Repack packages
+  package:
+    name:
+      - 'postgresql-{{ postgresql_version }}-repack'
+    state: present
+  become: yes
+  tags: [postgresql, packages]
+  when: "'pg_repack' in postgresql_extensions"
+
 - block:
     - name: Install PostGIS packages
       package:
