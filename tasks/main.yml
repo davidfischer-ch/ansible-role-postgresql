@@ -19,12 +19,12 @@
 - block:
     - name: Initialize PostgreSQL
       command: >
-        {{ postgresql_bin_directory }}/initdb
+        sudo -u postgres {{ postgresql_bin_directory }}/initdb
         --pgdata {{ postgresql_data_directory }}
         {{ postgresql_initdb_options|join(' ') }}
       args:
         creates: '{{ postgresql_data_directory }}/PG_VERSION'
-      become_user: postgres
+      # become_user: postgres
       environment:
         PATH: '{{ postgresql_bin_directory }}:$PATH'
         LD_LIBRARY_PATH: '{{ postgresql_lib_directory }}:$LD_LIBRARY_PATH'
