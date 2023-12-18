@@ -1,9 +1,11 @@
 ---
 
 - name: Install PostgreSQL packages
-  yum:
+  ansible.builtin.yum:
     name: '{{ postgresql_packages }}'
     enablerepo: '{{ postgresql_yum_enablerepo }}'
     state: present
-  become: yes
+  become: true
   tags: [postgresql, packages]  # FIXME Remove when this is fixed https://github.com/ansible/ansible/issues/30882
+
+...

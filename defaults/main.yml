@@ -1,3 +1,5 @@
+---
+
 # Packages
 postgresql_dynamic_defaults:
 
@@ -134,3 +136,5 @@ _postgresql_config:
 
 # postgresql_version: 9.6  # 15/08/2018
 _postgresql_version: "{{ postgresql_version|string|regex_replace('\\.', '') }}"
+
+...

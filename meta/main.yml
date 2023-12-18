@@ -8,3 +8,5 @@ dependencies:
     ufw_rules: '{{ postgresql_ufw_rules }}'
     tags: [postgresql, dependencies]
     when: postgresql_ufw_rules|length > 0
+
+...
