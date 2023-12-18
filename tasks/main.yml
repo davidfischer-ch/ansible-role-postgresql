@@ -13,7 +13,7 @@
       when: "'timescaledb' in postgresql_extensions"
   tags: [postgresql, always]
 
-- include: setup-{{ ansible_pkg_mgr }}.yml
+- include_tasks: setup-{{ ansible_pkg_mgr }}.yml
   tags: [postgresql, packages]
 
 - block:
